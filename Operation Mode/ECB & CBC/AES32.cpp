@@ -738,11 +738,10 @@ void AES32_Enc_KeySchedule(byte k[16], u32 rk[11][4]) {
 void AES32_Dec_KeySchedule(byte k[16], u32 rk[11][4]) {
 
 	AES32_Enc_KeySchedule(k, rk);
-	//1라운드 ~ 9라운드에 InvMixCol을 적용한다 !!!!! 
+	//1라운드 ~ 9라운드에 InvMixCol을 적용한다
 	// rk[1][],..., rk[9][] (rk[0][], rk[10][]은 그대로 둔다)
 	// Te4[x] = [ S[x], S[x], S[x], S[x] ]
 	// Tdi[] : InvMixColumns(InvSubBytes( SubBytes() ))
-	// 코드 이해하고, 간단히 만들어 보기 !!!!!
 	for (int i = 1; i <= 9; i++) {
 		rk[i][0] = Td0[Te4[(rk[i][0] >> 24)] & 0xff] ^ Td1[Te4[(rk[i][0] >> 16) & 0xff] & 0xff]
 			^ Td2[Te4[(rk[i][0] >> 8) & 0xff] & 0xff] ^ Td3[Te4[(rk[i][0]) & 0xff] & 0xff];
