@@ -1,16 +1,14 @@
-﻿// AES_GCM.cpp : 이 파일에는 'main' 함수가 포함됩니다. 거기서 프로그램 실행이 시작되고 종료됩니다.
-
 #include <iostream>
 #include "AES32.h"
 #include "GHASH.h"
 
-extern byte R0[256], R1[256]; // 외부 전역변수를 사용함
+extern byte R0[256], R1[256]; 
 
 //GCM 모드에서 사용하는 카운터 증가 함수 Inc_32()
 // counter: c[0] c[1] ... c[14] c[15] (MSB가 왼쪽, LSB가 오른쪽)
 void counter_inc(byte counter[16]) {
     for (int i = 15; i >= 0; i--) {
-        if (counter[i] != 0xff) { // 자리올림이 발생하지 않음
+        if (counter[i] != 0xff) { 
             counter[i]++;
             break;
         }
@@ -100,8 +98,8 @@ void AES_GCM(byte PT[], int pt_bytes, byte CTR[16], byte key[16],
     byte* MSG = (byte*)malloc(msg_bytes); // 에러처리 필요
     for (int i = 0; i < 16; i++) MSG[i] = first_block[i];
     for (int i = 0; i < pt_bytes; i++) MSG[i + 16] = CT[i]; // first_block 다음부터 채우기
-    for (int i = 0; i < remainder; i++) MSG[16 + pt_bytes + i] = 0x00; // 또 그 다음부터 
-    for (int i = 0; i < 16; i++) MSG[16 + pt_bytes + remainder + i] = last_block[i]; // 또 그 다음부터
+    for (int i = 0; i < remainder; i++) MSG[16 + pt_bytes + i] = 0x00; // 그 다음부터 
+    for (int i = 0; i < 16; i++) MSG[16 + pt_bytes + remainder + i] = last_block[i]; 
 
     // GHASH 연산
     byte HT[256][16]; // 사전계산용 테이블
@@ -111,25 +109,21 @@ void AES_GCM(byte PT[], int pt_bytes, byte CTR[16], byte key[16],
     AES32_Encrypt(CTR, rk, Y);
     xor_b_array(Tag, 16, Y);
 
-    // 메모리 해제
     free(MSG);
 }
 
-//=====================
-void AES_GCM_testvector0() {  // OK!
-    const char* hex_key = "11754cd72aec309bf52f7687212e8957";	//128
-    const char* hex_iv = "3c819d9a9bed087615030b65";			//96
-    const char* hex_pt = "";	//0
-    const char* hex_aad = "";	//0
-    const char* hex_ct = "";	//0
+void AES_GCM_testvector0() {  
+    const char* hex_key = "11754cd72aec309bf52f7687212e8957";	
+    const char* hex_iv = "3c819d9a9bed087615030b65";			
+    const char* hex_pt = "";	
+    const char* hex_aad = "";	
+    const char* hex_ct = "";	
     const char* hex_tag = "250327c674aaf477aef2675748cf6971";
 
     byte key[16], iv[16], pt[16], ct[16], aad[16], tag[16];
 
     Hex2Array(hex_key, 32, key);
     Hex2Array(hex_iv, 24, iv);
-    //Hex2Array(hex_pt, 32, pt);
-    //Hex2Array(hex_aad, 32, aad);
 
     printf("TestVector-GCM... \n");
 
@@ -143,13 +137,12 @@ void AES_GCM_testvector0() {  // OK!
     printf("(expected) tag = %s\n\n", hex_tag);
 }
 
-//=====================
 void AES_GCM_testvector1() {
-    const char* hex_key = "77be63708971c4e240d1cb79e8d77feb";	//128
-    const char* hex_iv = "e0e00f19fed7ba0136a797f3";			//96
-    const char* hex_pt = "";	//0
-    const char* hex_aad = "7a43ec1d9c0a5a78a0b16533a6213cab";	//128
-    const char* hex_ct = "";	//0	
+    const char* hex_key = "77be63708971c4e240d1cb79e8d77feb";	
+    const char* hex_iv = "e0e00f19fed7ba0136a797f3";			
+    const char* hex_pt = "";	
+    const char* hex_aad = "7a43ec1d9c0a5a78a0b16533a6213cab";	
+    const char* hex_ct = "";		
     const char* hex_tag = "209fcc8d3675ed938e9c7166709dd946";
 
     byte key[16], iv[16], pt[16], ct[16], aad[16], tag[16];
@@ -171,14 +164,13 @@ void AES_GCM_testvector1() {
     printf("(expected) tag = %s\n\n", hex_tag);
 }
 
-//=====================
 void AES_GCM_testvector2() {
-    const char* hex_key = "c939cc13397c1d37de6ae0e1cb7c423c";	//128
-    const char* hex_iv = "b3d8cc017cbb89b39e0f67e2";			//96
-    const char* hex_pt = "c3b3c41f113a31b73d9a5cd432103069";	//128
-    const char* hex_aad = "24825602bd12a984e0092d3e448eda5f";	//128
-    const char* hex_ct = "93fe7d9e9bfd10348a5606e5cafa7354";	//128
-    const char* hex_tag = "0032a1dc85f1c9786925a2e71d8272dd";	//128
+    const char* hex_key = "c939cc13397c1d37de6ae0e1cb7c423c";	
+    const char* hex_iv = "b3d8cc017cbb89b39e0f67e2";			
+    const char* hex_pt = "c3b3c41f113a31b73d9a5cd432103069";	
+    const char* hex_aad = "24825602bd12a984e0092d3e448eda5f";	
+    const char* hex_ct = "93fe7d9e9bfd10348a5606e5cafa7354";	
+    const char* hex_tag = "0032a1dc85f1c9786925a2e71d8272dd";	
 
     byte key[16], iv[16], pt[16], ct[16], aad[16], tag[16];
 
@@ -201,7 +193,6 @@ void AES_GCM_testvector2() {
     printf("(expected) tag = %s\n\n", hex_tag);
 }
 
-//=====================
 void AES_CTR_testvector() { //CTR 모드 확인용
     const char* hex_key = "2b7e151628aed2a6abf7158809cf4f3c";
     const char* hex_iv = "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff";
@@ -222,20 +213,6 @@ void AES_CTR_testvector() { //CTR 모드 확인용
 }
 
 void AES_GCM_testvector3() {
-    /*
-    [Keylen = 128]
-    [IVlen = 96]
-    [PTlen = 128]
-    [AADlen = 0]
-    [Taglen = 128]
-
-    Key = 7fddb57453c241d03efbed3ac44e371c
-    IV = ee283a3fc75575e33efd4887
-    PT = d5de42b461646c255c87bd2962d3b9a2
-    AAD =
-    CT = 2ccda4a5415cb91e135c2a0f78c9b2fd
-    Tag = b36d1df9b9d5e596f83e8b7f52971cb3
-    */
     const char* hex_key = "7fddb57453c241d03efbed3ac44e371c";
     const char* hex_iv = "ee283a3fc75575e33efd4887";
     const char* hex_pt = "d5de42b461646c255c87bd2962d3b9a2";
@@ -247,13 +224,11 @@ void AES_GCM_testvector3() {
     byte key[16], iv[16], pt[16], ct[16], aad[16], tag[16];
 
     Hex2Array(hex_key, 32, key);
-    Hex2Array(hex_iv, 24, iv);  //96비트
+    Hex2Array(hex_iv, 24, iv);  
     Hex2Array(hex_pt, 32, pt);
-    //Hex2Array(hex_aad, 32, aad);
 
     printf("TestVector-GCM... \n");
 
-    // CTR = IV(96bits) || 00...01 (32bits)
     byte CTR[16] = { 0, };
     for (int i = 0; i < 12; i++) CTR[i] = iv[i];
     CTR[15] = 0x01;
