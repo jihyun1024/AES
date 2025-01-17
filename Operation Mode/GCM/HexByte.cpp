@@ -1,45 +1,39 @@
-// HexByte.cpp
-/*=================
-  16Áø ¹®ÀÚ¿­À» ´Ù·ç´Â ÇÔ¼öµé
-=================*/
 #include "HexByte.h"
 
-// ÁÖ¾îÁø ¹®ÀÚ°¡ 16Áø¼ö ¼ıÀÚ·Î À¯È¿ÇÑ°¡?
-// 0,1,2, ... , 9, A~F, a~f
 bool isHex(char ch) {
-	return ((ch >= '0') && (ch <= '9')) ||  // 48~57 »çÀÌÀÎ°¡? (½ÊÁø¼ö·Î)
-		((ch >= 'A') && (ch <= 'F')) || // 65~70 »çÀÌÀÎ°¡? (½ÊÁø¼ö·Î)
-		((ch >= 'a') && (ch <= 'f'));  // 97~102 »çÀÌÀÎ°¡? (½ÊÁø¼ö·Î)
+	return ((ch >= '0') && (ch <= '9')) ||  // 48~57 ì‚¬ì´ì¸ê°€? (ì‹­ì§„ìˆ˜ë¡œ)
+		((ch >= 'A') && (ch <= 'F')) || // 65~70 ì‚¬ì´ì¸ê°€? (ì‹­ì§„ìˆ˜ë¡œ)
+		((ch >= 'a') && (ch <= 'f'));  // 97~102 ì‚¬ì´ì¸ê°€? (ì‹­ì§„ìˆ˜ë¡œ)
 }
 
-// ¹®ÀÚ·Î ¹ŞÀº 1°³ÀÇ 16Áø¼ö ---> 10Áø¼ö·Î 
-// (char) ---> (byte) 0~15 (¾Æ´Ï¸é ¿À·ù)
+// ë¬¸ìë¡œ ë°›ì€ 1ê°œì˜ 16ì§„ìˆ˜ ---> 10ì§„ìˆ˜ë¡œ 
+// (char) ---> (byte) 0~15 (ì•„ë‹ˆë©´ ì˜¤ë¥˜)
 // 'a' ---> 10,  '0' ---> 0,  'f' ---> 15
 byte Hex2Digit(char ch) {
 	if (!isHex(ch)) {
 		cout << ch << " is not a hex value." << endl;
-		return -1; //ÀÇ¹Ì¾ø´Â Ãâ·Â
+		return -1; //ì˜ë¯¸ì—†ëŠ” ì¶œë ¥
 	}
 	if ((ch >= '0') && (ch <= '9')) {
-		return  ch - '0'; // ¿¹: '4'-'0' = 52 - 48 = 4
+		return  ch - '0'; // ì˜ˆ: '4'-'0' = 52 - 48 = 4
 	}
 	else if ((ch >= 'A') && (ch <= 'F')) {
-		return ch - 'A' + 10;  // ¿¹: 'B' - 'A' + 10 = 66 - 65 + 10 = 11
+		return ch - 'A' + 10;  // ì˜ˆ: 'B' - 'A' + 10 = 66 - 65 + 10 = 11
 	}
 	else if ((ch >= 'a') && (ch <= 'f')) {
 		return ch - 'a' + 10;
 	}
-	// µµ´ŞÇÏÁö ¾Ê´Â ÄÚµå (È¤½Ã³ª...)
+	// ë„ë‹¬í•˜ì§€ ì•ŠëŠ” ì½”ë“œ (í˜¹ì‹œë‚˜...)
 	cout << "Unknown error." << endl;
 	return -1;
 }
 
-// 2ÀÚ¸® 16Áø¼ö ---> 1¹ÙÀÌÆ®
+// 2ìë¦¬ 16ì§„ìˆ˜ ---> 1ë°”ì´íŠ¸
 // h[] = { h[0], h[1] } = { 'a', '1' } ---> 1010 0001 = A1 = 161
 byte Hex2Byte(const char h[2]) {
 	byte upper, lower;
-	upper = h[0]; // »óÀ§ 4ºñÆ®(nibble)¸¦ ³ªÅ¸³¾ 1¹®ÀÚ
-	lower = h[1]; // ÇÏÀ§ 4ºñÆ®(nibble)¸¦ ³ªÅ¸³¾ 1¹®ÀÚ
+	upper = h[0]; // ìƒìœ„ 4ë¹„íŠ¸(nibble)ë¥¼ ë‚˜íƒ€ë‚¼ 1ë¬¸ì
+	lower = h[1]; // í•˜ìœ„ 4ë¹„íŠ¸(nibble)ë¥¼ ë‚˜íƒ€ë‚¼ 1ë¬¸ì
 	if ((!isHex(upper)) || (!isHex(lower))) {
 		cout << "Hex Error" << endl;
 		return -1;
@@ -48,24 +42,24 @@ byte Hex2Byte(const char h[2]) {
 	// h[] = { 'a', '1' } --> 10*16 + 01 = 161 = A1
 }
 
-// 16Áø ¹®ÀÚ¿­ ---> ¹ÙÀÌÆ® ¹è¿­
-// 16Áø ¹®ÀÚ¿­ hex_str[] = "8d2e60365f17c7df1040d7501b4a7b5a"  (32°³ 16Áø¼ö)
-// ¹®ÀÚ¿­ ±æÀÌ hex_len = 32 (Ãâ·Â ¹ÙÀÌÆ® ¹è¿­ÀÇ ±æÀÌ * 2)
-// Ãâ·Â ¹ÙÀÌÆ® ¹è¿­ barr[] = { '8d', '2e', ... , '5a' }
+// 16ì§„ ë¬¸ìì—´ ---> ë°”ì´íŠ¸ ë°°ì—´
+// 16ì§„ ë¬¸ìì—´ hex_str[] = "8d2e60365f17c7df1040d7501b4a7b5a"  (32ê°œ 16ì§„ìˆ˜)
+// ë¬¸ìì—´ ê¸¸ì´ hex_len = 32 (ì¶œë ¥ ë°”ì´íŠ¸ ë°°ì—´ì˜ ê¸¸ì´ * 2)
+// ì¶œë ¥ ë°”ì´íŠ¸ ë°°ì—´ barr[] = { '8d', '2e', ... , '5a' }
 void Hex2Array(const char hex_str[], int hex_len, byte barr[]) {
-	char h[2]; // h[] = { h[0], h[1] } ---> 1¹ÙÀÌÆ® b_value
+	char h[2]; // h[] = { h[0], h[1] } ---> 1ë°”ì´íŠ¸ b_value
 	byte b_value;
-	for (int i = 0; i < hex_len / 2; i++) { // barr[] Å©±â = hex_len/2
-		h[0] = hex_str[2 * i]; // »óÀ§ nibble
-		h[1] = hex_str[2 * i + 1]; // ÇÏÀ§ nibble
+	for (int i = 0; i < hex_len / 2; i++) { // barr[] í¬ê¸° = hex_len/2
+		h[0] = hex_str[2 * i]; // ìƒìœ„ nibble
+		h[1] = hex_str[2 * i + 1]; // í•˜ìœ„ nibble
 		// h[] = { hex_str[0], hex_str[1] },
 		// h[] = { hex_str[2], hex_str[3] }, ...
-		b_value = Hex2Byte(h); // 2ÀÚ¸® 16Áø¼ö ---> 1¹ÙÀÌÆ®
+		b_value = Hex2Byte(h); // 2ìë¦¬ 16ì§„ìˆ˜ ---> 1ë°”ì´íŠ¸
 		barr[i] = b_value;
 	}
 }
 
-// Ãâ·ÂÇÔ¼ö
+// ì¶œë ¥í•¨ìˆ˜
 // const char* pStr = nullptr (default: nullptr)
 // void print_b_array(byte b_arr[], int len, const char* pStr = nullptr);
 void print_b_array(byte b_arr[], int len, const char* pStr) {
@@ -78,7 +72,7 @@ void print_b_array(byte b_arr[], int len, const char* pStr) {
 	printf("\n");
 }
 
-// ¹ÙÀÌÆ® ¹è¿­ º¹»çÇÏ±â
+// ë°”ì´íŠ¸ ë°°ì—´ ë³µì‚¬í•˜ê¸°
 void copy_b_array(byte src[], int len, byte dest[]) {
 	for (int i = 0; i < len; i++) {
 		dest[i] = src[i];
@@ -86,7 +80,7 @@ void copy_b_array(byte src[], int len, byte dest[]) {
 }
 
 // data[] ---> data[] ^ xor_arr[] 
-// ÁÖÀÇ! data[] ¹è¿­ÀÇ ¾÷µ¥ÀÌÆ®  ( X xor Y ---> X ¾÷µ¥ÀÌÆ®)
+// ì£¼ì˜! data[] ë°°ì—´ì˜ ì—…ë°ì´íŠ¸  ( X xor Y ---> X ì—…ë°ì´íŠ¸)
 void xor_b_array(byte data[], int len, byte xor_arr[]) {
 	for (int i = 0; i < len; i++) {
 		data[i] ^= xor_arr[i];
