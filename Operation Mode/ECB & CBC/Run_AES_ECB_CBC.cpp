@@ -2,7 +2,7 @@
 #include <fstream>
 using namespace std;
 
-// AES32 ±¸Çö Çì´õ
+// AES32 êµ¬í˜„ í—¤ë”
 #include "AES32.h"
 
 void XOR_blocks(byte* out, byte* in1, byte* in2, int length) {
@@ -21,10 +21,10 @@ void AES_Enc_ECB(const char* filePT, byte key[16], const char* fileCT) {
         return;
     }
     int file_len;
-    fin.seekg(0, fin.end); // get-pointer¸¦ ¸Ç µÚ·Î ÀÌµ¿
+    fin.seekg(0, fin.end); // get-pointerë¥¼ ë§¨ ë’¤ë¡œ ì´ë™
     file_len = fin.tellg();
     cout << "file size(plaintext) = " << file_len << " bytes" << endl;
-    fin.seekg(0, fin.beg); // get-pointer¸¦ ¸Ç ¾ÕÀ¸·Î ÀÌµ¿
+    fin.seekg(0, fin.beg); // get-pointerë¥¼ ë§¨ ì•ìœ¼ë¡œ ì´ë™
 
     fout.open(fileCT, ios::binary);
     if (fout.fail()) {
@@ -36,13 +36,13 @@ void AES_Enc_ECB(const char* filePT, byte key[16], const char* fileCT) {
 
     cout << "file size(ciphertext) = " << num_block * 16 << " bytes" << endl;
 
-    //AES32 Å°½ºÄÉÁÙ
-    u32 rk[11][4]; // ¶ó¿îµåÅ°
+    //AES32 í‚¤ìŠ¤ì¼€ì¤„
+    u32 rk[11][4]; // ë¼ìš´ë“œí‚¤
     AES32_Enc_KeySchedule(key, rk);
 
-    //AES32 ECB ¾ÏÈ£È­
-    byte pt[16]; // ÇÑºí·Ï Æò¹®
-    byte ct[16]; // ÇÑºí·Ï ¾ÏÈ£¹®
+    //AES32 ECB ì•”í˜¸í™”
+    byte pt[16]; // í•œë¸”ë¡ í‰ë¬¸
+    byte ct[16]; // í•œë¸”ë¡ ì•”í˜¸ë¬¸
 
     for (int i = 0; i < num_block; i++) {
         fin.read((char*)pt, 16);
@@ -69,10 +69,10 @@ void AES_Enc_CBC(const char* filePT, byte key[16], const char* fileCT)
     }
 
     int file_len;
-    fin.seekg(0, fin.end); // get-pointer¸¦ ¸Ç µÚ·Î ÀÌµ¿
-    file_len = fin.tellg(); // get-pointerÀÇ ÇöÀç À§Ä¡ = fileÀÇ ±æÀÌ
+    fin.seekg(0, fin.end); // get-pointerë¥¼ ë§¨ ë’¤ë¡œ ì´ë™
+    file_len = fin.tellg(); // get-pointerì˜ í˜„ì¬ ìœ„ì¹˜ = fileì˜ ê¸¸ì´
     cout << "file size(plaintext) = " << file_len << "bytes" << endl;
-    fin.seekg(0, fin.beg); // get-pointer¸¦ ¸Ç ¾ÕÀ¸·Î ÀÌµ¿
+    fin.seekg(0, fin.beg); // get-pointerë¥¼ ë§¨ ì•ìœ¼ë¡œ ì´ë™
 
     fout.open(fileCT, ios::binary);
     if (fout.fail()) {
@@ -80,11 +80,11 @@ void AES_Enc_CBC(const char* filePT, byte key[16], const char* fileCT)
         return;
     }
 
-    // BlockÀÇ °³¼ö
+    // Blockì˜ ê°œìˆ˜
     int num_block = file_len / 16;
     cout << "file size(ciphertext) = " << num_block * 16 << "bytes" << endl;
 
-    // AES32 Å°½ºÄÉÁÙ ¹× CBC ¾ÏÈ£È­ ÄÚµå ÀÛ¼º
+    // AES32 í‚¤ìŠ¤ì¼€ì¤„ ë° CBC ì•”í˜¸í™” ì½”ë“œ ì‘ì„±
     u32 rk[11][4];
     AES32_Enc_KeySchedule(key, rk);
 
@@ -103,15 +103,14 @@ void AES_Enc_CBC(const char* filePT, byte key[16], const char* fileCT)
         memcpy(previous_ct, ct, 16);
     }
 
-    // ÆÄÀÏ ½ºÆ®¸² close
+    // íŒŒì¼ ìŠ¤íŠ¸ë¦¼ close
     fin.close();
     fout.close();
 }
 
 void File_Enc_ECB()
 {
-    //const char* PT = "PT_ECB.bin";
-    const char* PT = "C:\\Users\\°­ÁöÇö\\source\\repos\\File_IO\\AES_ECB\\PT-ECB.bin";
+    const char* PT = "PT-ECB.bin";
     const char* CT = "CT-ECB.bin";
 
     byte HWkey[16] = { 0x77, 0x23, 0xd8, 0x7d, 0x77, 0x3a, 0x8b, 0xbf,
@@ -136,7 +135,7 @@ void File_Enc_CBC()
 // Homework
 int main() {
     File_Enc_ECB();
-    //File_Enc_CBC();
+    File_Enc_CBC();
 
     return 0;
 }
