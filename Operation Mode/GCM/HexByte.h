@@ -1,4 +1,3 @@
-// HexByte.h
 #pragma once
 
 #include <iostream>
