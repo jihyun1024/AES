@@ -1,4 +1,3 @@
-//GHASH.h
 #pragma once
 
 #include "HexByte.h"
