@@ -1,8 +1,5 @@
-﻿// GHASH.cpp
 #include "HexByte.h"
 
-//----------------------------------------------------
-// 상수 R0[], R1[]: Make_GHASH_const_R0R1() 에서 생성한 코드임
 byte R0[256] = {
 0x00, 0x01, 0x03, 0x02, 0x07, 0x06, 0x04, 0x05, 0x0e, 0x0f, 0x0d, 0x0c, 0x09, 0x08, 0x0a, 0x0b,
 0x1c, 0x1d, 0x1f, 0x1e, 0x1b, 0x1a, 0x18, 0x19, 0x12, 0x13, 0x11, 0x10, 0x15, 0x14, 0x16, 0x17,
@@ -37,7 +34,6 @@ byte R1[256] = {
 0xa0, 0x62, 0x24, 0xe6, 0xa8, 0x6a, 0x2c, 0xee, 0xb0, 0x72, 0x34, 0xf6, 0xb8, 0x7a, 0x3c, 0xfe,
 0xc0, 0x02, 0x44, 0x86, 0xc8, 0x0a, 0x4c, 0x8e, 0xd0, 0x12, 0x54, 0x96, 0xd8, 0x1a, 0x5c, 0x9e,
 0xe0, 0x22, 0x64, 0xa6, 0xe8, 0x2a, 0x6c, 0xae, 0xf0, 0x32, 0x74, 0xb6, 0xf8, 0x3a, 0x7c, 0xbe };
-//----------------------------------------------------
 
 // GF(2^128) 데이터 = p[16] = p0 p1 ... p127 = [p0...p7] [p8... p15] ...
 // p(x) = p0 + p1*x + p2*x^2 + ... + p127*x^127
@@ -129,8 +125,8 @@ void Make_GHASH_H_table(byte H[16], byte HT[256][16]) {
 // (H(x)*P[13] + (H(x)*P[14] + H(x)*P[15]*x^8)*x^8)^8
 // H(x)*P[0] + (  ...  )*x^8
 void GF128_Hmul(byte state[16], byte HT[256][16], byte R0[256], byte R1[256]) {
-	byte W[16] = { 0, }; // 결과 저장용
-	byte temp; // 7차 이하 다항식
+	byte W[16] = { 0, };
+	byte temp;
 
 	for (int i = 0; i < 15; i++) { // 0, 1, 2, ... , 14
 		temp = state[15 - i]; // P[15], P[14], ... P[1]
@@ -159,10 +155,9 @@ void GHASH(byte msg[], int msg_blocks,
 	byte tag[16]) {
 	byte x[16];
 	byte out[16] = { 0, };
-	for (int i = 0; i < msg_blocks; i++) { // 메시지 블록 수 만큼
+	for (int i = 0; i < msg_blocks; i++) { 
 		for (int j = 0; j < 16; j++) x[j] = msg[i * 16 + j];
-		xor_b_array(out, 16, x); // out = x xor out
-		//GF128_mul(out, H); // out = out*H
+		xor_b_array(out, 16, x); 
 		GF128_Hmul(out, HT, R0, R1);
 	}
 	for (int j = 0; j < 16; j++) tag[j] = out[j];
@@ -228,7 +223,7 @@ void Make_GHASH_const_R0R1(byte R0[256], byte R1[256]) {
 		if (i != 255) { 
 			printf("0x%02x, ", R0[i]);
 		}
-		else { // 마지막의 경우 comma가 안 찍히게 하기 위해
+		else { 
 			printf("0x%02x ", R0[i]);
 
 		}
@@ -241,7 +236,7 @@ void Make_GHASH_const_R0R1(byte R0[256], byte R1[256]) {
 		if (i != 255) {
 			printf("0x%02x, ", R1[i]);
 		}
-		else { // 마지막의 경우 comma가 안 찍히게 하기 위해
+		else { 
 			printf("0x%02x ", R1[i]);
 
 		}
