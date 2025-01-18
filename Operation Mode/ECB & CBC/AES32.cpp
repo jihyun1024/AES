@@ -1,8 +1,7 @@
 ﻿#include <stdio.h>
 #include "AES32.h"
 
-//생성한 테이블
-//== AES32 Encryption Table ==
+//== AES256 Encryption Table ==
 u32 Te0[256] = {
 0xc66363a5, 0xf87c7c84, 0xee777799, 0xf67b7b8d,
 0xfff2f20d, 0xd66b6bbd, 0xde6f6fb1, 0x91c5c554,
@@ -334,7 +333,7 @@ u32 Te4[256] = {
 0xb0b0b0b0, 0x54545454, 0xbbbbbbbb, 0x16161616
 };
 
-//== AES32 Decryption Table ==
+//== AES256 Decryption Table ==
 u32 Td0[256] = {
 0x51f4a750, 0x7e416553, 0x1a17a4c3, 0x3a275e96,
 0x3bab6bcb, 0x1f9d45f1, 0xacfa58ab, 0x4be30393,
@@ -697,8 +696,7 @@ void print_AES_state(byte state[16], const char* pTitle) {
 	printf("\n");
 }
 
-//=========
-// 키스케줄 
+// KeySchedule
 static u32 Rcon[10] = { 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000,
 						0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000 };
 
@@ -712,7 +710,7 @@ u32 SubWord(u32 w32) {
 	return (Sbox[w32 >> 24] << 24) ^ (Sbox[(w32 >> 16) & 0xff] << 16) ^ (Sbox[(w32 >> 8) & 0xff] << 8) ^ Sbox[w32 & 0xff];
 }
 
-// AES32 암호화 키스케줄
+// AES256 Encryption KeySchedule
 void AES32_Enc_KeySchedule(byte k[16], u32 rk[11][4]) {
 	u32 tmp;
 	int rcon_counter;
@@ -734,7 +732,7 @@ void AES32_Enc_KeySchedule(byte k[16], u32 rk[11][4]) {
 	}
 }
 
-// AES32 복호화 키스케줄
+// AES256 Decryption KeySchedule
 void AES32_Dec_KeySchedule(byte k[16], u32 rk[11][4]) {
 
 	AES32_Enc_KeySchedule(k, rk);
@@ -753,9 +751,8 @@ void AES32_Dec_KeySchedule(byte k[16], u32 rk[11][4]) {
 			^ Td2[Te4[(rk[i][3] >> 8) & 0xff] & 0xff] ^ Td3[Te4[(rk[i][3]) & 0xff] & 0xff];
 	}
 }
-//=========
 
-//=====
+
 // 데이터 변환: 바이트 b[16] <--> 워드 state[4]
 void byte2state(byte b[16], u32 st[4]) {
 	st[0] = GETU32(b);
@@ -771,16 +768,6 @@ void state2byte(u32 st[4], byte b[16]) {
 	PUTU32(b + 12, st[3]);
 }
 
-// AES8 용 키스케줄
-void AES8_KeySchedule(byte k[16], byte rk[11][16]) {
-	u32 rk32[11][4];
-
-	AES32_Enc_KeySchedule(k, rk32);
-	for (int i = 0; i < 11; i++) {
-		state2byte(rk32[i], rk[i]);
-	}
-}
-
 void AES32_EncRound(u32 st[4], u32 rk[4]) {
 	u32 tmp[4];
 
@@ -792,7 +779,6 @@ void AES32_EncRound(u32 st[4], u32 rk[4]) {
 		st[k] = tmp[k];
 	}
 }
-
 
 void AES32_EqDecRound(u32 st[4], u32 rk[4]) {
 	u32 tmp[4];
