@@ -1,16 +1,13 @@
-﻿// AES32.cpp : 이 파일에는 'main' 함수가 포함됩니다. 거기서 프로그램 실행이 시작되고 종료됩니다.
-//
-
 #include <stdio.h>
 
 typedef unsigned int u32;
 typedef unsigned char byte;
 
-// byte array --> u32 정수로
+// byte array --> u32 int
 #define GETU32(b) ((u32)(b)[0] << 24) ^ ((u32)(b)[1] << 16) ^ \
 	((u32)(b)[2] << 8) ^ ((u32)(b)[3] << 0);
 
-// u32 정수 -- > byte array
+// u32 int -- > byte array
 #define PUTU32(b, x) \
 { \
 	(b)[0] = (byte) ((x) >> 24); \
@@ -19,8 +16,7 @@ typedef unsigned char byte;
 	(b)[3] = (byte) ((x) >> 0); \
 }
 
-//생성한 테이블
-//== AES32 Encryption Table ==
+//== AES256 Encryption Table ==
 u32 Te0[256] = {
 0xc66363a5, 0xf87c7c84, 0xee777799, 0xf67b7b8d,
 0xfff2f20d, 0xd66b6bbd, 0xde6f6fb1, 0x91c5c554,
@@ -352,7 +348,7 @@ u32 Te4[256] = {
 0xb0b0b0b0, 0x54545454, 0xbbbbbbbb, 0x16161616
 };
 
-//== AES32 Decryption Table ==
+//== AES256 Decryption Table ==
 u32 Td0[256] = {
 0x51f4a750, 0x7e416553, 0x1a17a4c3, 0x3a275e96,
 0x3bab6bcb, 0x1f9d45f1, 0xacfa58ab, 0x4be30393,
@@ -704,8 +700,7 @@ byte Sbox[256] = {
 };
 
 
-
-// 키스케줄 부분
+// Key Schedule
 static u32 Rcon[10] = { 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000,
 						0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000 };
 
@@ -721,7 +716,7 @@ u32 SubWord(u32 w32)
 		(Sbox[(w32 >> 8) & 0xff] << 8) ^ Sbox[w32 & 0xff];
 }
 
-// AES32 암호화 키스케줄
+// AES256 Encryption KeySchedule
 void AES32_Enc_KeySchedule(byte k[16], u32 rk[11][4])
 {
 	u32 tmp;
@@ -750,7 +745,7 @@ void AES32_Enc_KeySchedule(byte k[16], u32 rk[11][4])
 	}
 }
 
-// AES32 복호화 키스케줄
+// AES256 Decryption KeySchedule
 void AES32_Dec_KeySchedule(byte k[16], u32 rk[11][4])
 {
 	AES32_Enc_KeySchedule(k, rk);
@@ -759,7 +754,6 @@ void AES32_Dec_KeySchedule(byte k[16], u32 rk[11][4])
 
 	// Te4[x] = [ S[x], S[x], S[x], S[x] ]
 	// Tdi[]: InvMixColumns(InvSubBytes(SubBytes()))
-	// 코드 이해하고, 간단히 만들어 보기 -> 아주 중요함.
 	for (int i = 1; i <= 9; i++)
 	{
 		rk[i][0] = Td0[Te4[(rk[i][0] >> 24)] & 0xff] ^ Td1[Te4[(rk[i][0] >> 16) & 0xff] & 0xff]
@@ -773,7 +767,7 @@ void AES32_Dec_KeySchedule(byte k[16], u32 rk[11][4])
 	}
 }
 
-// 데이터 변환 (byte 배열 -> word 배열)
+// byte array -> word array
 void byte2State(byte b[16], u32 st[4])
 {
 	st[0] = GETU32(b);
@@ -782,7 +776,7 @@ void byte2State(byte b[16], u32 st[4])
 	st[3] = GETU32(b + 12);
 }
 
-// 데이터 변환 (word 배열 -> byte 배열)
+// word array -> byte array
 void state2Byte(u32 st[4], byte b[16])
 {
 	PUTU32(b, st[0]);
@@ -791,19 +785,7 @@ void state2Byte(u32 st[4], byte b[16])
 	PUTU32(b + 12, st[3]);
 }
 
-// AES8용 키스케줄 (8bit일 때는 암호화와 복호화를 굳이 구분할 필요 없음)
-void AES8_KeySchedule(byte k[16], byte rk[11][16])
-{
-	u32 rk32[11][4];
-
-	AES32_Enc_KeySchedule(k, rk32);
-	for (int i = 0; i < 11; i++)
-	{
-		state2Byte(rk32[i], rk[i]);
-	}
-}
-
-// AES32 한 라운드 암호화
+// AES256 1 Round Encryption
 void AES32_EncRound(u32 st[4], u32 rk[4])
 {
 	u32 tmp[4];
@@ -832,7 +814,7 @@ void AES32_EqDecRound(u32 st[4], u32 rk[4]) {
 	}
 }
 
-// AES32bit 암호화
+// AES256 Encryption
 void AES32_Encrypt(byte pt[16], u32 rk[11][4], byte ct[16])
 {
 	u32 tmp[4], st[4];
@@ -861,7 +843,7 @@ void AES32_EqDecrypt(byte ct[16], u32 rk[11][4], byte pt[16]) {
 	byte2State(ct, st);
 	for (int k = 0; k < 4; k++) st[k] ^= rk[10][k];
 	for (int r = 9; r >= 1; r--) AES32_EqDecRound(st, rk[r]);
-	// 10라운드 
+	// 10 Round
 	tmp[0] = (Td4[st[0] >> 24] & 0xff000000) ^ (Td4[(st[3] >> 16) & 0xff] & 0x00ff0000)
 		^ (Td4[(st[2] >> 8) & 0xff] & 0x0000ff00) ^ (Td4[st[1] & 0xff] & 0x000000ff) ^ rk[0][0];
 	tmp[1] = (Td4[st[1] >> 24] & 0xff000000) ^ (Td4[(st[0] >> 16) & 0xff] & 0x00ff0000)
