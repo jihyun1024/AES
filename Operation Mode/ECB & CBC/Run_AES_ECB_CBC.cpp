@@ -2,7 +2,7 @@
 #include <fstream>
 using namespace std;
 
-// AES32 구현 헤더
+// AES256 header
 #include "AES32.h"
 
 void XOR_blocks(byte* out, byte* in1, byte* in2, int length) {
@@ -36,13 +36,13 @@ void AES_Enc_ECB(const char* filePT, byte key[16], const char* fileCT) {
 
     cout << "file size(ciphertext) = " << num_block * 16 << " bytes" << endl;
 
-    //AES32 키스케줄
-    u32 rk[11][4]; // 라운드키
+    //AES256 KeySchedule
+    u32 rk[11][4]; // RoundKey
     AES32_Enc_KeySchedule(key, rk);
 
-    //AES32 ECB 암호화
-    byte pt[16]; // 한블록 평문
-    byte ct[16]; // 한블록 암호문
+    //AES256 ECB Encryption
+    byte pt[16]; // 1 Block Plaintext
+    byte ct[16]; // 1 Block Ciphertext
 
     for (int i = 0; i < num_block; i++) {
         fin.read((char*)pt, 16);
@@ -84,7 +84,7 @@ void AES_Enc_CBC(const char* filePT, byte key[16], const char* fileCT)
     int num_block = file_len / 16;
     cout << "file size(ciphertext) = " << num_block * 16 << "bytes" << endl;
 
-    // AES32 키스케줄 및 CBC 암호화 코드 작성
+    // AES256 KeySchedule and CBC Encryption
     u32 rk[11][4];
     AES32_Enc_KeySchedule(key, rk);
 
@@ -103,7 +103,7 @@ void AES_Enc_CBC(const char* filePT, byte key[16], const char* fileCT)
         memcpy(previous_ct, ct, 16);
     }
 
-    // 파일 스트림 close
+    // Close File Stream
     fin.close();
     fout.close();
 }
@@ -132,7 +132,6 @@ void File_Enc_CBC()
     AES_Enc_CBC(PT, HWkey, CT);
 }
 
-// Homework
 int main() {
     File_Enc_ECB();
     File_Enc_CBC();
