@@ -722,7 +722,7 @@ void AES32_Enc_KeySchedule(byte k[16], u32 rk[11][4])
 	u32 tmp;
 	int rcon_counter;
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++) 
 	{
 		rk[0][i] = GETU32(k + 4 * i);
 	}
